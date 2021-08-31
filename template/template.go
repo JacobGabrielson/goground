@@ -11,7 +11,7 @@ const (
 	bottlerocketUserData = `
 [settings.kubernetes]
 api-server = "{{.Cluster.Endpoint}}"
-{{if .Cluster.CABundle}}cluster-certificate = "{{.Cluster.CABundle}}"{{end}}
+{{if .Cluster.CABundle}}{{if len .Cluster.CABundle}}cluster-certificate = "{{.Cluster.CABundle}}"{{end}}{{end}}
 cluster-name = "{{if .Cluster.Name}}{{.Cluster.Name}}{{end}}"
 {{if .Constraints.Labels }}[settings.kubernetes.node-labels]{{ end }}
 {{ range $Key, $Value := .Constraints.Labels }}"{{ $Key }}" = "{{ $Value }}"
@@ -19,6 +19,7 @@ cluster-name = "{{if .Cluster.Name}}{{.Cluster.Name}}{{end}}"
 {{if .Constraints.Taints }}[settings.kubernetes.node-taints]{{ end }}
 {{ range $Taint := .Constraints.Taints }}"{{ $Taint.Key }}" = "{{ $Taint.Value}}:{{ $Taint.Effect }}"
 {{ end }}
+{{.Cluster.Mergatroid}}
 `
 )
 
@@ -26,6 +27,10 @@ type cluster struct {
 	Endpoint string
 	CABundle *string
 	Name     string
+}
+
+func (c cluster) Mergatroid() string {
+	return "MergatroidWasHere"
 }
 
 type constraints struct {
